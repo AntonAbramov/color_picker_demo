@@ -1,7 +1,8 @@
 .container {
   width: 100%;
-  max-width: 1000px;
-  margin: 24px auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -11,8 +12,16 @@
   padding: 32px;
 }
 
+.canvasContainer {
+  height: 100%;
+  overflow: auto;
+  background-color: #cccccc;
+  padding: 10px;
+}
+
 .canvas {
-  width: 100%;
+  box-shadow: 0 0 4px;
+  background-color: #ffffff;
 }
 
 .colorPickerButton {

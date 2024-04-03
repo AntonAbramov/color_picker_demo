@@ -19,9 +19,14 @@ export const pickColor = (
 export const getImageDataForColorPickerPreview = (
   x: number,
   y: number,
+  width: number,
+  height: number,
   context: CanvasRenderingContext2D
 ) => {
-  return context.getImageData(x - 10, y - 10, 20, 20, {
+  const halfWidth = Math.floor(width / 2);
+  const halfHeight = Math.floor(height / 2);
+
+  return context.getImageData(x - halfWidth, y - halfHeight, width, height, {
     colorSpace: COLOR_SPACE,
   });
 };

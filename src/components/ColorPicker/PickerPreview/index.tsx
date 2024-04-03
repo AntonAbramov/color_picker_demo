@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useEditorContext } from "../../../hooks/useEditorContext";
 import styles from "./pickerPreview.module.css";
 
 interface PickerPreviewProps {
@@ -27,6 +28,7 @@ export const PickerPreview = forwardRef(
     { visible, width, height, pixelSize }: PickerPreviewProps,
     ref: ForwardedRef<PickerPreviewRefInterface>
   ) => {
+    const { scale } = useEditorContext();
     const containerRef = useRef<HTMLDivElement | null>(null);
     const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -104,6 +106,7 @@ export const PickerPreview = forwardRef(
           width: width * pixelSize,
           height: height * pixelSize,
           display: visible ? "block" : "none",
+          scale: `${1 / scale}`,
         }}
         onMouseEnter={(e) => e.preventDefault()}
       >

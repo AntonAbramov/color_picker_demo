@@ -1,7 +1,6 @@
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { CanvasProps } from "../Canvas";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { useEditorContext } from "../../hooks/useEditorContext";
 import { PickerPreview, PickerPreviewRefInterface } from "./PickerPreview";
-import { PIXEL_RATIO } from "../../constants/dimensions";
 import { getImageDataForColorPickerPreview, pickColor } from "./utils";
 import styles from "./colorPicker.module.css";
 
@@ -12,14 +11,15 @@ interface ColorPickerProps {
   onColor: (hex: string | undefined) => void;
 }
 
+const PICKER_WIDTH = 15;
+const PICKER_HEIGHT = 15;
 export const ColorPicker = ({
   children,
   disabled,
-  loading,
   onColor,
 }: ColorPickerProps) => {
+  const { ctx, scale } = useEditorContext();
   const ref = useRef<HTMLDivElement | null>(null);
-  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const previewHelperRef = useRef<PickerPreviewRefInterface | null>(null);
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
 
@@ -39,14 +39,13 @@ export const ColorPicker = ({
       const x = event.offsetX;
       const y = event.offsetY;
 
-      const canvasX = x * PIXEL_RATIO;
-      const canvasY = y * PIXEL_RATIO;
-
-      const color = pickColor(canvasX, canvasY, context);
+      const color = pickColor(x, y, context);
       currentColor = color;
       const imageData = getImageDataForColorPickerPreview(
-        canvasX,
-        canvasY,
+        x,
+        y,
+        PICKER_WIDTH,
+        PICKER_HEIGHT,
         context
       );
 
@@ -74,43 +73,29 @@ export const ColorPicker = ({
     }
 
     const container = ref.current;
-    if (!canvas || !previewHelperRef.current || !container) {
-      return;
-    }
-    const context = canvas.getContext("2d");
-    if (!context) {
+    if (!ctx || !previewHelperRef.current || !container) {
       return;
     }
 
     const handler = () => {
-      mouseEnter(context);
+      mouseEnter(ctx);
     };
     container.addEventListener("mouseenter", handler);
 
     return () => {
       container.removeEventListener("mouseenter", handler);
     };
-  }, [canvas, previewHelperRef.current, disabled]);
-
-  const childrenElement = useMemo(() => {
-    return loading
-      ? null
-      : React.cloneElement<CanvasProps>(children as any, {
-          onParentRef: (el: HTMLCanvasElement | null) => {
-            setCanvas(el);
-          },
-        });
-  }, [loading]);
+  }, [ctx, previewHelperRef.current, disabled]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{ scale: `${scale}` }}>
       {!disabled && <div ref={ref} className={styles.mask} />}
-      {childrenElement}
+      {children}
       <PickerPreview
         visible={previewVisible}
-        width={15}
-        height={15}
-        pixelSize={15}
+        width={PICKER_WIDTH}
+        height={PICKER_HEIGHT}
+        pixelSize={10}
         ref={previewHelperRef}
       />
     </div>
