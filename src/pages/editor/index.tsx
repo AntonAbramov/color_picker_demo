@@ -14,7 +14,7 @@ const CANVAS_SIZE = {
   height: 600,
 };
 const Editor = () => {
-  const { setScale, scale: contextScale } = useEditorContext();
+  const { setScale, scale: contextScale, setLayersOrder } = useEditorContext();
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const [pickedColor, setPickedColor] = useState<string>();
   const [disabled, setDisabled] = useState(true);
@@ -54,6 +54,10 @@ const Editor = () => {
       container.removeEventListener("wheel", wheel);
     };
   }, [canvasContainerRef.current]);
+
+  useEffect(() => {
+    setLayersOrder(["Test", "Image layer"]);
+  }, []);
 
   const onColor = (hex: string | undefined) => {
     setPickedColor(hex);

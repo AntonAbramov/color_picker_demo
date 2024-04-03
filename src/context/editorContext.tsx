@@ -54,7 +54,6 @@ export const EditorContextProvider = ({
 
   const addLayer = (layer: Layer) => {
     layers.current.push(layer);
-    layersOrder.current.push(layer.id);
   };
 
   const moveTo = (layerId: string, targetLayerId: string) => {
