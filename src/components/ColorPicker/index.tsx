@@ -1,4 +1,11 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useEditorContext } from "../../hooks/useEditorContext";
 import { PickerPreview, PickerPreviewRefInterface } from "./PickerPreview";
 import { getImageDataForColorPickerPreview, pickColor } from "./utils";
@@ -13,91 +20,92 @@ interface ColorPickerProps {
 
 const PICKER_WIDTH = 15;
 const PICKER_HEIGHT = 15;
-export const ColorPicker = ({
-  children,
-  disabled,
-  onColor,
-}: ColorPickerProps) => {
-  const { ctx, scale } = useEditorContext();
-  const ref = useRef<HTMLDivElement | null>(null);
-  const previewHelperRef = useRef<PickerPreviewRefInterface | null>(null);
-  const [previewVisible, setPreviewVisible] = useState<boolean>(false);
+export const ColorPicker = forwardRef(
+  (
+    { children, disabled, onColor }: ColorPickerProps,
+    colorPickerRef: ForwardedRef<HTMLDivElement>
+  ) => {
+    const { ctx } = useEditorContext();
+    const ref = useRef<HTMLDivElement | null>(null);
+    const previewHelperRef = useRef<PickerPreviewRefInterface | null>(null);
+    const [previewVisible, setPreviewVisible] = useState<boolean>(false);
 
-  const mouseEnter = (context: CanvasRenderingContext2D) => {
-    const container = ref.current;
-    if (!container) {
-      return;
-    }
-    setPreviewVisible(true);
+    const mouseEnter = (context: CanvasRenderingContext2D) => {
+      const container = ref.current;
+      if (!container) {
+        return;
+      }
+      setPreviewVisible(true);
 
-    let currentColor: string | undefined;
-    container.onclick = () => {
-      onColor(currentColor);
-      setPreviewVisible(false);
+      let currentColor: string | undefined;
+      container.onclick = () => {
+        onColor(currentColor);
+        setPreviewVisible(false);
+      };
+      const mouseMove = (event: MouseEvent) => {
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        const color = pickColor(x, y, context);
+        currentColor = color;
+        const imageData = getImageDataForColorPickerPreview(
+          x,
+          y,
+          PICKER_WIDTH,
+          PICKER_HEIGHT,
+          context
+        );
+
+        previewHelperRef.current?.setImageData &&
+          previewHelperRef.current?.setImageData(imageData);
+        previewHelperRef.current?.setPosition &&
+          previewHelperRef.current?.setPosition(x, y);
+        previewHelperRef.current?.setColor &&
+          previewHelperRef.current?.setColor(color);
+      };
+
+      container.addEventListener("mousemove", mouseMove);
+
+      const mouseLeave = () => {
+        setPreviewVisible(false);
+        container.removeEventListener("mousemove", mouseMove);
+        container.removeEventListener("mouseleave", mouseLeave);
+      };
+      container.addEventListener("mouseleave", mouseLeave);
     };
-    const mouseMove = (event: MouseEvent) => {
-      const x = event.offsetX;
-      const y = event.offsetY;
 
-      const color = pickColor(x, y, context);
-      currentColor = color;
-      const imageData = getImageDataForColorPickerPreview(
-        x,
-        y,
-        PICKER_WIDTH,
-        PICKER_HEIGHT,
-        context
-      );
+    useEffect(() => {
+      if (disabled) {
+        return;
+      }
 
-      previewHelperRef.current?.setImageData &&
-        previewHelperRef.current?.setImageData(imageData);
-      previewHelperRef.current?.setPosition &&
-        previewHelperRef.current?.setPosition(x, y);
-      previewHelperRef.current?.setColor &&
-        previewHelperRef.current?.setColor(color);
-    };
+      const container = ref.current;
+      if (!ctx || !previewHelperRef.current || !container) {
+        return;
+      }
 
-    container.addEventListener("mousemove", mouseMove);
+      const handler = () => {
+        mouseEnter(ctx);
+      };
+      container.addEventListener("mouseenter", handler);
 
-    const mouseLeave = () => {
-      setPreviewVisible(false);
-      container.removeEventListener("mousemove", mouseMove);
-      container.removeEventListener("mouseleave", mouseLeave);
-    };
-    container.addEventListener("mouseleave", mouseLeave);
-  };
+      return () => {
+        container.removeEventListener("mouseenter", handler);
+      };
+    }, [ctx, previewHelperRef.current, disabled]);
 
-  useEffect(() => {
-    if (disabled) {
-      return;
-    }
-
-    const container = ref.current;
-    if (!ctx || !previewHelperRef.current || !container) {
-      return;
-    }
-
-    const handler = () => {
-      mouseEnter(ctx);
-    };
-    container.addEventListener("mouseenter", handler);
-
-    return () => {
-      container.removeEventListener("mouseenter", handler);
-    };
-  }, [ctx, previewHelperRef.current, disabled]);
-
-  return (
-    <div className={styles.container} style={{ scale: `${scale}` }}>
-      {!disabled && <div ref={ref} className={styles.mask} />}
-      {children}
-      <PickerPreview
-        visible={previewVisible}
-        width={PICKER_WIDTH}
-        height={PICKER_HEIGHT}
-        pixelSize={10}
-        ref={previewHelperRef}
-      />
-    </div>
-  );
-};
+    return (
+      <div ref={colorPickerRef} className={styles.container}>
+        {!disabled && <div ref={ref} className={styles.mask} />}
+        {children}
+        <PickerPreview
+          visible={previewVisible}
+          width={PICKER_WIDTH}
+          height={PICKER_HEIGHT}
+          pixelSize={10}
+          ref={previewHelperRef}
+        />
+      </div>
+    );
+  }
+);

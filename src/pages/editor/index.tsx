@@ -14,26 +14,38 @@ const CANVAS_SIZE = {
   height: 600,
 };
 const Editor = () => {
-  const { canvas, setScale, scale: contextScale } = useEditorContext();
+  const { setScale, scale: contextScale } = useEditorContext();
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const [pickedColor, setPickedColor] = useState<string>();
   const [disabled, setDisabled] = useState(true);
   const scale = useRef<number>(contextScale);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = canvasContainerRef.current;
-    if (!container || !canvas) {
+    const colorPickerContainer = colorPickerRef.current;
+    if (!container || !colorPickerContainer) {
       return;
     }
+
+    let scrollTop = container.scrollTop;
+    let scrollLeft = container.scrollLeft;
     const wheel = (event: WheelEvent) => {
       if (event.ctrlKey) {
-        container.style.scrollBehavior = "none";
+        event.preventDefault();
         const deltaY = event.deltaY > 0 ? 1 : -1;
+
         scale.current += 0.1 * deltaY;
 
+        scrollTop = event.offsetY * scale.current - event.offsetY;
+        scrollLeft = event.offsetX * scale.current - event.offsetX;
+
+        container.scrollTo({
+          top: scrollTop,
+          left: scrollLeft,
+        });
+        colorPickerContainer.style.scale = `${scale.current}`;
         setScale(scale.current);
-      } else {
-        container.style.scrollBehavior = "";
       }
     };
     container.addEventListener("wheel", wheel);
@@ -71,7 +83,12 @@ const Editor = () => {
         <span />
       </div>
       <div className={styles.canvasContainer} ref={canvasContainerRef}>
-        <ColorPicker disabled={disabled} loading={false} onColor={onColor}>
+        <ColorPicker
+          ref={colorPickerRef}
+          disabled={disabled}
+          loading={false}
+          onColor={onColor}
+        >
           <EditorCanvas
             className={styles.canvas}
             width={CANVAS_SIZE.width}
