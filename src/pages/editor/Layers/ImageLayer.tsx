@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Layer } from "./Layer";
 import { useEditorContext } from "../../../hooks/useEditorContext";
 import { loadImageData } from "../../../helpers/loaders";
@@ -14,7 +14,6 @@ interface ImageLayerProps {
 export const ImageLayer = ({ src, id }: ImageLayerProps) => {
   const { selectedLayerId, setSelectedLayerId, ctx, canvas, addLayer, render } =
     useEditorContext();
-  const [currentImage, setCurrentImage] = useState<HTMLImageElement>();
   const imageOptions = useRef<Rect>({
     x: 0,
     y: 0,
@@ -44,14 +43,14 @@ export const ImageLayer = ({ src, id }: ImageLayerProps) => {
       }
 
       const aspectRatio = image.width / image.height;
+      const currentImageWidth =
+        canvas.width < image.width ? canvas.width : image.width;
       imageOptions.current = {
-        width: canvas.width < image.width ? canvas.width : image.width,
-        height: image.height / aspectRatio,
+        width: currentImageWidth,
+        height: currentImageWidth / aspectRatio,
         x: 0,
         y: 0,
       };
-
-      setCurrentImage(image);
 
       addLayer({
         id,

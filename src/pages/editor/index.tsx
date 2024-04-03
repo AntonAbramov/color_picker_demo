@@ -94,8 +94,8 @@ const Editor = () => {
             width={CANVAS_SIZE.width}
             height={CANVAS_SIZE.height}
           >
-            <ImageLayer id="Image layer" src={Image} />
             <ImageLayer id="Test" src={OtherImage} />
+            <ImageLayer id="Image layer" src={Image} />
           </EditorCanvas>
         </ColorPicker>
       </div>
