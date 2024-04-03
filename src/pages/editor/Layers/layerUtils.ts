@@ -38,27 +38,25 @@ export const getDivLayerBoundaryNewRect = (
   let rectWidth = layerRect.width;
   let rectHeight = layerRect.height;
 
-  let rectY = layerRect.y;
   let rectX = layerRect.x;
+  let rectY = layerRect.y;
 
-  if (layerRect.x < 0) {
-    rectWidth += layerRect.x;
+  if (rectX < 0) {
+    rectWidth += rectX;
     rectX = 0;
-  } else {
-    if (rectWidth + layerRect.x > canvasWidth) {
-      const part = rectWidth + layerRect.x - canvasWidth;
-      rectWidth -= part;
-    }
+  }
+  if (rectWidth + rectX > canvasWidth) {
+    const part = rectWidth + rectX - canvasWidth;
+    rectWidth -= part;
   }
 
-  if (layerRect.y < 0) {
-    rectHeight += layerRect.y;
+  if (rectY < 0) {
+    rectHeight += rectY;
     rectY = 0;
-  } else {
-    if (rectHeight + layerRect.y > canvasHeight) {
-      const part = rectHeight + layerRect.y - canvasHeight;
-      rectHeight -= part;
-    }
+  }
+  if (rectHeight + rectY > canvasHeight) {
+    const part = rectHeight + rectY - canvasHeight;
+    rectHeight -= part;
   }
 
   return {
