@@ -1,4 +1,5 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Layer } from "./Layer";
 import { useEditorContext } from "../../../hooks/useEditorContext";
 import { loadImageData } from "../../../helpers/loaders";
 import { drawEditRect, getDivLayerBoundaryNewRect } from "./layerUtils";
@@ -121,18 +122,14 @@ export const ImageLayer = ({ src, id }: ImageLayerProps) => {
   };
 
   return (
-    <div
-      ref={ref as MutableRefObject<HTMLDivElement>}
-      data-attr="layer-mask"
-      data-layer-id={id}
+    <Layer
+      ref={ref}
+      id={id}
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
         zIndex: zIndexController.zIndex,
         cursor: selectedLayerId === id ? "grab" : undefined,
       }}
-      onClick={onSelect}
+      onSelect={onSelect}
     />
   );
 };
