@@ -80,9 +80,7 @@ export const ColorPicker = forwardRef(
       }
 
       const container = ref.current;
-      if (!ctx || !previewHelperRef.current || !container) {
-        return;
-      }
+      if (!ctx || !previewHelperRef.current || !container) return;
 
       const handler = () => {
         mouseEnter(ctx);
@@ -92,7 +90,7 @@ export const ColorPicker = forwardRef(
       return () => {
         container.removeEventListener("mouseenter", handler);
       };
-    }, [ctx, previewHelperRef.current, disabled]);
+    }, [ctx, previewHelperRef, disabled]);
 
     return (
       <div ref={colorPickerRef} className={styles.container}>

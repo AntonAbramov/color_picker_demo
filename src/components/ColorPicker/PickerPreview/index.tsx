@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { useEditorContext } from "../../../hooks/useEditorContext";
+import { drawLines } from "../utils";
 import styles from "./pickerPreview.module.css";
 
 interface PickerPreviewProps {
@@ -56,6 +57,10 @@ export const PickerPreview = forwardRef(
             const top = `${y - halfWidth}px`;
             const left = `${x - halfHeight}px`;
 
+            /*
+               Using top and left is slower than transform: translate(),
+               but top and left do not require scaling.
+            */
             container.style.top = top;
             container.style.left = left;
           },
@@ -65,7 +70,7 @@ export const PickerPreview = forwardRef(
           setColor: setCurrentColor,
         };
       },
-      [containerRef.current, canvasElementRef.current]
+      [containerRef, canvasElementRef]
     );
 
     useEffect(() => {
@@ -75,28 +80,9 @@ export const PickerPreview = forwardRef(
       }
       const context = overlayCanvas.getContext("2d");
       if (context) {
-        drawLines(context);
+        drawLines(context, width, height, pixelSize);
       }
-    }, [overlayCanvasRef.current]);
-
-    const drawLines = (context: CanvasRenderingContext2D) => {
-      context.lineWidth = 0.5;
-      context.strokeStyle = "#cccccc";
-
-      for (let row = 0; row < height; row++) {
-        context.beginPath();
-        context.moveTo(0, row * pixelSize);
-        context.lineTo(width * pixelSize, row * pixelSize);
-        context.stroke();
-      }
-
-      for (let col = 0; col < width; col++) {
-        context.beginPath();
-        context.moveTo(col * pixelSize, 0);
-        context.lineTo(col * pixelSize, height * pixelSize);
-        context.stroke();
-      }
-    };
+    }, [overlayCanvasRef, width, height, pixelSize]);
 
     return (
       <div

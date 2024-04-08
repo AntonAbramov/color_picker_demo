@@ -30,3 +30,27 @@ export const getImageDataForColorPickerPreview = (
     colorSpace: COLOR_SPACE,
   });
 };
+
+export const drawLines = (
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  pixelSize: number
+) => {
+  context.lineWidth = 0.5;
+  context.strokeStyle = "#cccccc";
+
+  for (let row = 0; row < height; row++) {
+    context.beginPath();
+    context.moveTo(0, row * pixelSize);
+    context.lineTo(width * pixelSize, row * pixelSize);
+    context.stroke();
+  }
+
+  for (let col = 0; col < width; col++) {
+    context.beginPath();
+    context.moveTo(col * pixelSize, 0);
+    context.lineTo(col * pixelSize, height * pixelSize);
+    context.stroke();
+  }
+};

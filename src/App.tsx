@@ -1,12 +1,7 @@
 import Editor from "./pages/editor";
-import { EditorContextProvider } from "./context/editorContext";
 
 function App() {
-  return (
-    <EditorContextProvider>
-      <Editor />
-    </EditorContextProvider>
-  );
+  return <Editor />;
 }
 
 export default App;

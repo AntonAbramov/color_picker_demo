@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import cn from "classnames";
 import { ImageLayer } from "./Layers/ImageLayer";
 import { ColorPicker } from "../../components/ColorPicker";
 import { EditorCanvas } from "../../components/EditorCanvas";
+import { EditorContextProvider } from "../../context/editorContext";
 import { useEditorContext } from "../../hooks/useEditorContext";
 import Image from "../../assets/images/image.jpg";
 import OtherImage from "../../assets/images/test.webp";
@@ -13,7 +14,16 @@ const CANVAS_SIZE = {
   width: 800,
   height: 600,
 };
+
 const Editor = () => {
+  return (
+    <EditorContextProvider>
+      <EditorContent />
+    </EditorContextProvider>
+  );
+};
+
+const EditorContent = () => {
   const { setScale, scale: contextScale, setLayersOrder } = useEditorContext();
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const [pickedColor, setPickedColor] = useState<string>();
@@ -24,13 +34,11 @@ const Editor = () => {
   useEffect(() => {
     const container = canvasContainerRef.current;
     const colorPickerContainer = colorPickerRef.current;
-    if (!container || !colorPickerContainer) {
-      return;
-    }
+    if (!container || !colorPickerContainer) return;
 
     let scrollTop = container.scrollTop;
     let scrollLeft = container.scrollLeft;
-    const wheel = (event: WheelEvent) => {
+    const onZoom = (event: WheelEvent) => {
       if (event.ctrlKey) {
         event.preventDefault();
         const deltaY = event.deltaY > 0 ? 1 : -1;
@@ -48,25 +56,25 @@ const Editor = () => {
         setScale(scale.current);
       }
     };
-    container.addEventListener("wheel", wheel);
+    container.addEventListener("wheel", onZoom);
 
     return () => {
-      container.removeEventListener("wheel", wheel);
+      container.removeEventListener("wheel", onZoom);
     };
-  }, [canvasContainerRef.current]);
+  }, [canvasContainerRef]);
 
   useEffect(() => {
     setLayersOrder(["Test", "Image layer"]);
   }, []);
 
-  const onColor = (hex: string | undefined) => {
+  const onColor = useCallback((hex: string | undefined) => {
     setPickedColor(hex);
     setDisabled(true);
-  };
+  }, []);
 
-  const toggleColorPicker = () => {
+  const toggleColorPicker = useCallback(() => {
     setDisabled((prev) => !prev);
-  };
+  }, []);
 
   return (
     <div className={styles.container}>

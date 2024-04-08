@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import cn from "classnames";
 import { useEditorContext } from "../../hooks/useEditorContext";
 import styles from "./editorCanvas.module.css";
@@ -18,13 +18,7 @@ export const EditorCanvas = ({
   onRef: propsOnRef,
   children,
 }: CanvasProps) => {
-  const { setCtx, ctx, setCanvas, canvas } = useEditorContext();
-
-  useEffect(() => {
-    if (!ctx || !canvas) {
-      return;
-    }
-  }, [ctx, canvas]);
+  const { setCtx, setCanvas } = useEditorContext();
 
   const onRef = (el: HTMLCanvasElement) => {
     if (!el) {

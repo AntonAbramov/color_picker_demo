@@ -26,9 +26,7 @@ export const useLayerRectEditor = (
 
   useEffect(() => {
     const container = ref.current;
-    if (!container || !canvas || selectedLayerId !== id) {
-      return;
-    }
+    if (!container || !canvas || selectedLayerId !== id) return;
 
     const mousedown = (event: MouseEvent) => {
       container.style.cursor = "grabbing";
@@ -88,7 +86,7 @@ export const useLayerRectEditor = (
       container.removeEventListener("mousedown", mousedown);
       container.removeEventListener("wheel", wheel);
     };
-  }, [ref.current, selectedLayerId, zIndex, scale]);
+  }, [ref, selectedLayerId, zIndex, scale]);
 
   return [ref, { zIndex, setZIndex }, { isDragging, setIsDragging }];
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Layer } from "./Layer";
 import { useEditorContext } from "../../../hooks/useEditorContext";
 import { loadImageData } from "../../../helpers/loaders";
@@ -33,9 +33,8 @@ export const ImageLayer = ({ src, id }: ImageLayerProps) => {
   }, [selectedLayerId]);
 
   useEffect(() => {
-    if (!ctx || !canvas) {
-      return;
-    }
+    if (!ctx || !canvas) return;
+
     loadImageData(src).then((image) => {
       if (!image) {
         alert("Image not loaded.");
@@ -65,9 +64,8 @@ export const ImageLayer = ({ src, id }: ImageLayerProps) => {
 
   const drawImage = (image: HTMLImageElement) => {
     const container = ref.current;
-    if (!ctx || !canvas || !container) {
-      return;
-    }
+    if (!ctx || !canvas || !container) return;
+
     const width = imageOptions.current.width;
     const height = imageOptions.current.height;
 
@@ -111,14 +109,14 @@ export const ImageLayer = ({ src, id }: ImageLayerProps) => {
     }
   };
 
-  const onSelect = () => {
+  const onSelect = useCallback(() => {
     draggingController.setIsDragging(false);
     if (draggingController.isDragging) {
       return;
     }
 
     setSelectedLayerId(selectedLayerId === id ? undefined : id);
-  };
+  }, [selectedLayerId, id, draggingController.isDragging]);
 
   return (
     <Layer

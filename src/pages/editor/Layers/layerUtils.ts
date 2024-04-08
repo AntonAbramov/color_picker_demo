@@ -15,10 +15,6 @@ export const drawEditRect = (
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x + width, y + height);
-  ctx.stroke();
-  ctx.closePath();
-
-  ctx.beginPath();
   ctx.moveTo(x, y + height);
   ctx.lineTo(x + width, y);
   ctx.stroke();
